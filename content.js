@@ -273,7 +273,7 @@ const STAGES = [];
 
 /* ===== STAGE 1 — DEPARTURE LOUNGE ======================================= */
 STAGES.push({
-  id: 's1', podcast: '', slides: '', video: 'https://youtu.be/cwF1xnQHKMI', art: 'lounge', n: 1, name: 'Departure Lounge', cefr: 'A2–B1',
+  id: 's1', podcast: 'audio/gate-1.mp3', slides: 'slides/gate-1.pdf', video: 'https://youtu.be/cwF1xnQHKMI', art: 'lounge', n: 1, name: 'Departure Lounge', cefr: 'A2–B1',
   gate: 'Gate 1',
   blurb: 'You have decided to travel. Before you can compare anything, you need to know what CAN be compared — and how to build the form.',
   lessons: [
@@ -460,7 +460,7 @@ STAGES.push({
 
 /* ===== STAGE 2 — BOOKING DESK ========================================== */
 STAGES.push({
-  id: 's2', podcast: '', slides: '', video: 'https://youtu.be/ntEwGOjEkq0', art: 'desk', n: 2, name: 'Booking Desk', cefr: 'B1',
+  id: 's2', podcast: 'audio/gate-2.mp3', slides: 'slides/gate-2.pdf', video: 'https://youtu.be/ntEwGOjEkq0', art: 'desk', n: 2, name: 'Booking Desk', cefr: 'B1',
   gate: 'Gate 2',
   blurb: 'Comparing two options is easy. Now you have twelve hotels on screen and you must pick the one — which means superlatives.',
   lessons: [
@@ -637,7 +637,7 @@ STAGES.push({
 
 /* ===== STAGE 3 — PRICE COMPARISON ====================================== */
 STAGES.push({
-  id: 's3', podcast: '', slides: '', video: 'https://youtu.be/otD2wrrTzdE', art: 'tags', n: 3, name: 'Price Comparison', cefr: 'B1+',
+  id: 's3', podcast: 'audio/gate-3.mp3', slides: 'slides/gate-3.pdf', video: 'https://youtu.be/otD2wrrTzdE', art: 'tags', n: 3, name: 'Price Comparison', cefr: 'B1+',
   gate: 'Gate 3',
   blurb: 'Two tabs open, four prices, and a friend who wants to argue. Equal, not equal, twice as much, and the difference between fewer and less.',
   lessons: [
@@ -832,7 +832,7 @@ STAGES.push({
 
 /* ===== STAGE 4 — TIMETABLE ============================================= */
 STAGES.push({
-  id: 's4', podcast: '', slides: '', video: '', art: 'timetable', n: 4, name: 'Timetable', cefr: 'B2',
+  id: 's4', podcast: 'audio/gate-4.mp3', slides: '', video: '', art: 'timetable', n: 4, name: 'Timetable', cefr: 'B2',
   gate: 'Gate 4',
   blurb: '"It is faster" tells nobody anything. This stage is about the slot in front of the comparative — the one that says how much.',
   lessons: [
@@ -1014,7 +1014,7 @@ STAGES.push({
 
 /* ===== STAGE 5 — TERMS & CONDITIONS ==================================== */
 STAGES.push({
-  id: 's5', podcast: '', slides: '', video: '', art: 'contract', n: 5, name: 'Terms & Conditions', cefr: 'B2',
+  id: 's5', podcast: 'audio/gate-5.mp3', slides: '', video: '', art: 'contract', n: 5, name: 'Terms & Conditions', cefr: 'B2',
   gate: 'Gate 5',
   blurb: 'The small print of comparison. What exactly is being compared with what — and why "cheaper than Tokyo" is the most common C1 writing error in the language.',
   lessons: [
@@ -1211,7 +1211,7 @@ STAGES.push({
 
 /* ===== STAGE 6 — DEPARTURES BOARD ====================================== */
 STAGES.push({
-  id: 's6', podcast: '', slides: '', video: '', art: 'board', n: 6, name: 'Departures Board', cefr: 'B2+',
+  id: 's6', podcast: 'audio/gate-6.mp3', slides: '', video: '', art: 'board', n: 6, name: 'Departures Board', cefr: 'B2+',
   gate: 'Gate 6',
   blurb: 'Superlatives, properly. When the disappears, how the set is really chosen, and the three different words spelled most.',
   lessons: [
@@ -1400,7 +1400,7 @@ STAGES.push({
 
 /* ===== STAGE 7 — THE LONG HAUL ========================================= */
 STAGES.push({
-  id: 's7', podcast: '', slides: '', video: '', art: 'nightflight', n: 7, name: 'The Long Haul', cefr: 'C1',
+  id: 's7', podcast: 'audio/gate-7.mp3', slides: '', video: '', art: 'nightflight', n: 7, name: 'The Long Haul', cefr: 'C1',
   gate: 'Gate 7',
   blurb: 'Two quantities moving together, trends that keep going, and a thousand-year-old fossil hiding in "the more, the merrier".',
   lessons: [
@@ -1579,7 +1579,7 @@ STAGES.push({
 
 /* ===== STAGE 8 — ARRIVALS ============================================== */
 STAGES.push({
-  id: 's8', podcast: '', slides: '', video: '', art: 'arrivals', n: 8, name: 'Arrivals', cefr: 'C1',
+  id: 's8', podcast: 'audio/gate-8.mp3', slides: '', video: '', art: 'arrivals', n: 8, name: 'Arrivals', cefr: 'C1',
   gate: 'Gate 8',
   blurb: 'Comparison without adjectives, the pairs that split into two meanings, and how a C1 writer actually builds a comparison paragraph.',
   lessons: [

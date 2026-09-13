@@ -616,11 +616,14 @@
     };
   }
 
+  /* Gates are free to enter in any order, so rank counts every gate cleared
+     rather than an unbroken run from the first. A student who starts at
+     Gate 5 because that is what their class is doing still gets credit. */
   function stageClearedCount(p) {
     var n = 0;
     for (var i = 0; i < C.STAGES.length; i++) {
       var ch = p.challenges[C.STAGES[i].challenge.id];
-      if (ch && ch.best >= PASS_CHALLENGE) n++; else break;
+      if (ch && ch.best >= PASS_CHALLENGE) n++;
     }
     return n;
   }
@@ -632,12 +635,10 @@
     }).length;
   }
   function challengeUnlocked(p, st) { return lessonsDone(p, st) === st.lessons.length; }
-  function stageUnlocked(p, st) {
-    if (st.n === 1) return true;
-    var prev = C.STAGES[st.n - 2];
-    var ch = p.challenges[prev.challenge.id];
-    return !!(ch && ch.best >= PASS_CHALLENGE);
-  }
+  /* Open navigation: any gate, any time. The Boarding Check inside a gate
+     still waits for its three lessons — that is a check on the gate's own
+     material, not a lock on where a student may go. */
+  function stageUnlocked() { return true; }
 
   /* trip readiness: each stage is worth 12.5 — lessons 60%, challenge 40% */
   function readiness(p) {

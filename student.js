@@ -244,7 +244,6 @@
     }
     for (var i = 0; i < C.STAGES.length; i++) {
       var st = C.STAGES[i];
-      if (!P.stageUnlocked(p, st)) break;
       for (var j = 0; j < st.lessons.length; j++) {
         var ls = st.lessons[j], rec = p.lessons[ls.id];
         if (!rec || rec.best < E.PASS_LESSON) {
@@ -295,22 +294,23 @@
 
     html += '<div class="gates">';
     C.STAGES.forEach(function (st) {
-      var unlocked = P.stageUnlocked(p, st);
+      var unlocked = true;                       /* every gate is open */
       var chal = p.challenges[st.challenge.id];
       var cleared = chal && chal.best >= E.PASS_CHALLENGE;
+      var current = next && next.st && next.st.id === st.id;
       var pc = stagePct(st);
       var open = S.stageOpen === st.id;
-      var cls = 'gate' + (cleared ? ' done' : unlocked ? ' open' : ' locked') + (open ? ' exp' : '');
+      var cls = 'gate' + (cleared ? ' done' : current ? ' open' : '') + (open ? ' exp' : '');
 
       html += '<div class="' + cls + '" data-stage="' + st.id + '"><div class="dot"></div><div class="gate-card">';
-      html += '<button class="gate-head" data-toggle="' + st.id + '"' + (unlocked ? '' : ' disabled') + '>' +
+      html += '<button class="gate-head" data-toggle="' + st.id + '">' +
         E.artBand(st.art, 'gate-art') +
         '<div class="gate-meta">' +
           '<div class="gate-line1">' +
             '<span class="gate-n">' + esc(st.gate) + '</span>' +
             '<span class="gate-name">' + esc(st.name) + '</span>' +
             '<span class="pill">' + esc(st.cefr) + '</span>' +
-            (cleared ? '<span class="pill good">Cleared</span>' : unlocked ? '' : '<span class="pill">Locked</span>') +
+            (cleared ? '<span class="pill good">Cleared</span>' : current ? '<span class="pill on">You are here</span>' : '') +
           '</div>' +
           '<p class="gate-blurb">' + esc(st.blurb) + '</p>' +
           '<div class="gate-prog"><div class="bar"><span style="width:' + pc + '%"></span></div>' +
@@ -868,6 +868,19 @@
     $('#s-simple').addEventListener('click', function () { S.simple = !S.simple; paintSettings(); });
     $('#s-out').addEventListener('click', logout);
   }
+
+  /* The Line ID is the one thing on the ribbon a student would want to take
+     away, so make it one tap rather than a transcription exercise. */
+  var lineBtn = $('#line-id');
+  if (lineBtn) lineBtn.addEventListener('click', function () {
+    var id = 'pegasus028';
+    function done() { toast('Line ID copied: ' + id); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(id).then(done, function () { toast('Line ID: ' + id); });
+    } else {
+      toast('Line ID: ' + id);
+    }
+  });
 
   setMode('in');
 })();

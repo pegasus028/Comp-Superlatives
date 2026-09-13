@@ -14,7 +14,7 @@
 .hidden{display:none!important}
 
 /* ---------------------------------------------------------- login card */
-#screen-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 16px}
+#screen-login{display:flex;align-items:center;justify-content:center;padding:28px 16px}
 .boarding{
   width:100%;max-width:460px;background:var(--surface);border-radius:var(--r-l);
   box-shadow:var(--shadow-l);overflow:hidden;border:1px solid var(--rule-soft);
@@ -314,6 +314,30 @@ main{padding-block:22px 72px}
 .verdict.ok{animation:pop .28s ease-out}
 @keyframes pop{0%{transform:scale(.985)}60%{transform:scale(1.008)}100%{transform:scale(1)}}
 
+/* ------------------------------------------------------- contact ribbon */
+:root{--ribbon-h:30px}
+.ribbon{
+  position:sticky;top:0;z-index:40;height:var(--ribbon-h);
+  background:var(--ink);color:var(--ground);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.07em;
+  padding-inline:12px;
+}
+.ribbon-in{display:inline-flex;align-items:center;gap:6px;text-align:center;line-height:1.2}
+.ribbon-id{
+  border:none;background:var(--gold);color:var(--ink);cursor:pointer;
+  font:inherit;font-weight:600;letter-spacing:.08em;
+  padding:2px 8px;border-radius:99px;
+}
+.ribbon-id:hover{filter:brightness(1.1)}
+.ribbon-id:active{transform:translateY(1px)}
+@media (max-width:400px){
+  .ribbon{font-size:9.5px;letter-spacing:.03em}
+}
+/* the boarding-pass header now sits under the ribbon, not over it */
+.bp{top:var(--ribbon-h)}
+#screen-login{min-height:calc(100vh - var(--ribbon-h))}
+
 /* --------------------------------------------- stage resources (header) */
 .gate-res{
   display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 14px;
@@ -393,11 +417,18 @@ main{padding-block:22px 72px}
 </head>
 <body>
 
+<!-- Persistent contact ribbon — sits above every screen of the portal. -->
+<div class="ribbon">
+  <span class="ribbon-in">Contact T.Chris for more info on Line ID:
+    <button class="ribbon-id" id="line-id" title="Tap to copy">pegasus028</button>
+  </span>
+</div>
+
 <!-- ===================== LOGIN ===================== -->
 <div id="screen-login">
   <div class="boarding">
     <div class="boarding-top">
-      <p class="kicker">Satriwithaya English Program</p>
+      <p class="kicker">Comparatives &amp; Superlatives · CEFR A2–C1</p>
       <h1>Departure Board</h1>
       <p>Comparatives and superlatives, eight gates, one trip. Get to Frequent Flyer.</p>
     </div>
