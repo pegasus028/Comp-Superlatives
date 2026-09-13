@@ -70,17 +70,36 @@
   }
 
   /* ---------------------------------------------------------------- cloud */
+  /* A stalled network is worse than a failed one: a captive portal or a
+     half-connected hotspot can leave a fetch hanging for minutes, and the
+     student just sees "Creating your account…" forever. Time every request
+     out so it fails fast and the local fallback takes over. */
+  var TIMEOUT_MS = 12000;
+
   function post(action, payload) {
     if (state.token) payload.token = state.token;
-    return fetch(state.url, {
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer;
+    var req = fetch(state.url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: action, payload: payload || {} }),
-      redirect: 'follow'
+      redirect: 'follow',
+      signal: ctrl ? ctrl.signal : undefined
     }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     });
+    var guard = new Promise(function (_, reject) {
+      timer = setTimeout(function () {
+        if (ctrl) { try { ctrl.abort(); } catch (e) {} }
+        reject(new Error('Timed out after ' + (TIMEOUT_MS / 1000) + 's'));
+      }, TIMEOUT_MS);
+    });
+    return Promise.race([req, guard]).then(
+      function (v) { clearTimeout(timer); return v; },
+      function (e) { clearTimeout(timer); throw e; }
+    );
   }
 
   /* Try cloud, fall back to the local implementation on any failure.
@@ -273,24 +292,10 @@
     detail: function (id) { return call('detail', { id: id }, function () { return localDetail(id); }); },
     assign: function (id, paper) { return call('assign', { id: id, paper: paper }, function () { return localAssign(id, paper); }); },
 
-    /* demo helpers */
-    demoReset: function () { try { localStorage.removeItem(LS_DEMO); } catch (e) {} },
-    demoSeed: function (progressList) {
-      var d = db();
-      progressList.forEach(function (p) {
-        d.students[p.studentId] = { id: p.studentId, name: p.displayName, pw: hash('demo'), created: p.created || new Date().toISOString(), progress: p };
-      });
-      saveDb(d);
-    },
-    demoPushAttempts: function (rows) { var d = db(); d.attempts = d.attempts.concat(rows); saveDb(d); },
-    demoPushSessions: function (rows) { var d = db(); d.sessions = d.sessions.concat(rows); saveDb(d); },
-    demoHas: function (id) { return !!db().students[id]; },
-    /* Purely local — never touches the class server, so a preview can never
-       create a stray account in the teacher's sheet. */
-    demoLogin: function (id) {
-      var s = db().students[id];
-      return Promise.resolve(s ? { ok: true, progress: s.progress } : { ok: false, error: 'No local demo account.' });
-    }
+    /* Local store, used only as an offline fallback for a real account.
+       There is no preview or demo mode: every interaction belongs to a
+       signed-in student and is queued for the class sheet. */
+    localCount: function () { return Object.keys(db().students).length; }
   };
 
   function keepToken(r) {

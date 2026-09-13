@@ -10,7 +10,7 @@
   var S = {
     p: null,               // progress object
     /* answers live in api's persistent outbox, not in memory */
-    sessItems: 0, sessCorrect: 0, sandbox: false,
+    sessItems: 0, sessCorrect: 0,
     run: null,             // active run: {kind, items, i, results, lessonId, chId, hinted}
     simple: false,
     stageOpen: null,
@@ -37,7 +37,7 @@
 
   /* --------------------------------------------------------------- sync */
   function sync() {
-    if (!S.p || S.sandbox) return Promise.resolve();
+    if (!S.p) return Promise.resolve();
     S.p._readiness = P.readiness(S.p);      /* derived column for the sheet */
     return api.save(S.p).catch(function () { return { ok: false }; });
   }
@@ -53,25 +53,21 @@
   /* ------------------------------------------------------- connection
      Students never configure anything. The address ships with the page, so
      the session is connected from the first click. If the network drops we
-     keep working, hold the unsent answers, and reconnect on our own. */
-  /* Students are never shown connection state. A dropped network is not
-     their problem to solve: answers are queued on the device the moment they
-     are given, the app retries on its own, and the teacher console is where
-     a genuine outage surfaces. The only place a student can see it is
-     Settings, if they go looking. */
+     keep working, hold the unsent answers, and reconnect on our own.
+
+     Students are never shown connection state. A dropped network is not their
+     problem to solve: answers are queued on the device the moment they are
+     given, the app retries on its own, and the teacher console is where a
+     genuine outage surfaces. The only place a student can see it is Settings,
+     if they go looking. */
   function paintLink() {
-    var slot = $('#modebar-slot');
-    slot.innerHTML = S.sandbox
-      ? '<div class="wrap"><div class="modebar"><span><b>Preview</b> &nbsp;' +
-        'This is an example account for looking around. Nothing here is saved or sent to your teacher.' +
-        '</span></div></div>'
-      : '';
+    $('#modebar-slot').innerHTML = '';
   }
   api.onModeChange = function () { paintLink(); };
 
   /* Quiet reconnect: flip back to cloud and let a real save prove it. */
   setInterval(function () {
-    if (!S.p || S.sandbox) return;
+    if (!S.p) return;
     if (api.mode !== 'cloud') api.retryCloud();
     if (api.pendingCount()) sync();
   }, 15000);
@@ -107,12 +103,19 @@
     if (mode === 'new' && !name) return say('Enter the name your teacher will see.', true);
     $('#btn-go').disabled = true;
     say(mode === 'new' ? 'Creating your account…' : 'Checking…');
+    /* Apps Script can take a few seconds to wake up. Say so, rather than
+       leaving a teenager looking at a frozen button. */
+    var slow = setTimeout(function () {
+      say('Still working — the class server is waking up. This can take a few seconds.');
+    }, 4000);
     var req = mode === 'new' ? api.register(id, pw, name) : api.login(id, pw);
     req.then(function (r) {
+      clearTimeout(slow);
       $('#btn-go').disabled = false;
       if (!r || !r.ok) return say((r && r.error) || 'Something went wrong. Try again.', true);
       start(r.progress || P.blank(id, name || id));
     }).catch(function (e) {
+      clearTimeout(slow);
       $('#btn-go').disabled = false;
       say('Could not reach the server: ' + e.message, true);
     });
@@ -121,38 +124,6 @@
   ['f-id', 'f-pw', 'f-name'].forEach(function (k) {
     $('#' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
   });
-
-  $('#btn-demo').addEventListener('click', function () {
-    var id = 'demo-traveller';
-    if (!api.demoHas(id)) api.demoSeed([seedDemo(id)]);
-    S.sandbox = true;                       /* never writes to the class sheet */
-    api.demoLogin(id).then(function (r) { start(r.progress || seedDemo(id)); });
-  });
-
-  /* A demo account opens partway through the map, so the first look shows a
-     working app rather than an empty shell. Clearly an example, not real data. */
-  function seedDemo(id) {
-    var p = P.blank(id, 'Demo Traveller');
-    p.xp = 940; p.streak = 4; p.longestStreak = 4; p.sessions = 5;
-    p.lastActiveDate = E.today();
-    p.lessons = {
-      s1l1: { best: 1, attempts: 1 }, s1l2: { best: 0.83, attempts: 2 }, s1l3: { best: 1, attempts: 1 },
-      s2l1: { best: 0.83, attempts: 1 }, s2l2: { best: 0.71, attempts: 2 }, s2l3: { best: 0.8, attempts: 1 },
-      s3l1: { best: 0.8, attempts: 1 }, s3l2: { best: 0.6, attempts: 2 }
-    };
-    p.challenges = { s1ch: { best: 1, attempts: 1, perfect: true, noHint: true }, s2ch: { best: 0.875, attempts: 2, failedOnce: true, comeback: true } };
-    p.badges = ['passport', 'streak3', 'upgrade', 'solo', 'rebooked'];
-    p.stats = {
-      seen: 74, correct: 58,
-      byTag: {
-        gradability: { a: 8, c: 7 }, 'form-er-more': { a: 12, c: 9 }, 'than-basic': { a: 8, c: 7 },
-        'superlative-the': { a: 9, c: 8 }, 'superlative-set': { a: 11, c: 6 }, irregular: { a: 7, c: 6 },
-        equative: { a: 9, c: 8 }, ratio: { a: 6, c: 4 }, 'less-fewer': { a: 4, c: 3 }
-      }
-    };
-    p.review = { 's2l2-01': { box: 1, due: 5, misses: 2 }, 's3l2-01': { box: 1, due: 5, misses: 1 }, 's2l2-03': { box: 2, due: 7, misses: 1 } };
-    return p;
-  }
 
   /* =====================================================================
      START
@@ -168,7 +139,7 @@
     paintLink();
     paintHeader();
     show('map');
-    if (!S.sandbox) api.startSession(S.p.studentId);
+    api.startSession(S.p.studentId);
     var earned = P.checkBadges(S.p);
     sync();
     if (isNewDay && S.p.streak > 1) toast('Day ' + S.p.streak + ' in a row. Keep the streak alive.');
@@ -176,20 +147,19 @@
   }
 
   function logout() {
-    if (S.sandbox) { location.reload(); return; }
     api.endSession(S.p.studentId, S.sessItems, S.sessCorrect);
     sync().then(function () { api.clearToken(); location.reload(); });
   }
   $('#btn-out').addEventListener('click', logout);
   /* fetch() is cancelled when the tab goes; sendBeacon survives it. */
   function flushOnExit() {
-    if (!S.p || S.sandbox) return;
+    if (!S.p) return;
     api.endSession(S.p.studentId, S.sessItems, S.sessCorrect);
     if (!api.flushBeacon(S.p)) sync();
   }
   window.addEventListener('pagehide', flushOnExit);
   document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'hidden' && S.p && !S.sandbox && api.pendingCount()) {
+    if (document.visibilityState === 'hidden' && S.p && api.pendingCount()) {
       api.flushBeacon(S.p);
     }
   });
@@ -323,19 +293,19 @@
       if (unlocked && (st.podcast || st.slides || st.video)) {
         var m = (p.podcasts || {})[st.id] || {};
         html += '<div class="gate-res" data-res="' + st.id + '">';
-        if (st.podcast) {
-          html += '<button class="res' + (m.done ? ' done' : '') + '" data-act="pod" data-stage="' + st.id + '">' +
-            '<span class="res-i">' + (m.done ? '✓' : '♪') + '</span>Podcast' +
-            (m.done ? '' : m.seconds ? '<span class="res-x">' + Math.round(m.seconds / 60) + 'm in</span>' : '') +
-            '</button>';
+        if (st.video) {
+          html += '<button class="res' + (m.videoOpens ? ' done' : '') + '" data-act="yt" data-stage="' + st.id + '">' +
+            '<span class="res-i">▶</span>Video</button>';
         }
         if (st.slides) {
           html += '<a class="res' + (m.slidesOpens ? ' done' : '') + '" href="' + esc(st.slides) + '" target="_blank" rel="noopener" data-act="pdf" data-stage="' + st.id + '">' +
             '<span class="res-i">▤</span>Slides</a>';
         }
-        if (st.video) {
-          html += '<button class="res' + (m.videoOpens ? ' done' : '') + '" data-act="yt" data-stage="' + st.id + '">' +
-            '<span class="res-i">▶</span>Video</button>';
+        if (st.podcast) {
+          html += '<button class="res' + (m.done ? ' done' : '') + '" data-act="pod" data-stage="' + st.id + '">' +
+            '<span class="res-i">' + (m.done ? '✓' : '♪') + '</span>Podcast' +
+            (m.done ? '' : m.seconds ? '<span class="res-x">' + Math.round(m.seconds / 60) + 'm in</span>' : '') +
+            '</button>';
         }
         html += '<div class="res-drop" id="drop-' + st.id + '"></div></div>';
       }
@@ -869,18 +839,15 @@
     $('#s-out').addEventListener('click', logout);
   }
 
-  /* The Line ID is the one thing on the ribbon a student would want to take
-     away, so make it one tap rather than a transcription exercise. */
-  var lineBtn = $('#line-id');
-  if (lineBtn) lineBtn.addEventListener('click', function () {
-    var id = 'pegasus028';
-    function done() { toast('Line ID copied: ' + id); }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(id).then(done, function () { toast('Line ID: ' + id); });
-    } else {
-      toast('Line ID: ' + id);
-    }
-  });
+  /* The ribbon is fixed, so the page needs to start below it — and it can
+     wrap to two lines on a narrow phone, so measure rather than assume. */
+  function sizeRibbon() {
+    var r = document.querySelector('.ribbon');
+    if (r) document.documentElement.style.setProperty('--ribbon-h', r.offsetHeight + 'px');
+  }
+  sizeRibbon();
+  window.addEventListener('resize', sizeRibbon);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizeRibbon);
 
   setMode('in');
 })();

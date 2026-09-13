@@ -315,26 +315,44 @@ main{padding-block:22px 72px}
 @keyframes pop{0%{transform:scale(.985)}60%{transform:scale(1.008)}100%{transform:scale(1)}}
 
 /* ------------------------------------------------------- contact ribbon */
-:root{--ribbon-h:30px}
+:root{
+  --ribbon-h:46px;
+  /* Fixed rather than token-derived: the ribbon keeps the same purple and
+     the same white text in light and dark, so it reads as branding rather
+     than as part of the surrounding surface. */
+  --ribbon-bg:#4B3B9C;
+  --ribbon-fg:#FFFFFF;
+}
 .ribbon{
-  position:sticky;top:0;z-index:40;height:var(--ribbon-h);
-  background:var(--ink);color:var(--ground);
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  background:var(--ribbon-bg);color:var(--ribbon-fg);
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.07em;
-  padding-inline:12px;
+  padding:10px 14px;text-align:center;
+  box-shadow:0 1px 0 rgba(0,0,0,.12);
 }
-.ribbon-in{display:inline-flex;align-items:center;gap:6px;text-align:center;line-height:1.2}
+.ribbon-in{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+  font-family:var(--f-display);font-weight:600;font-size:1.02rem;line-height:1.25;
+  letter-spacing:-.005em;
+}
 .ribbon-id{
-  border:none;background:var(--gold);color:var(--ink);cursor:pointer;
-  font:inherit;font-weight:600;letter-spacing:.08em;
-  padding:2px 8px;border-radius:99px;
+  display:inline-block;color:var(--ribbon-fg);text-decoration:none;
+  font-family:var(--f-display);font-weight:800;font-size:1.1rem;letter-spacing:.01em;
+  padding:3px 13px;border-radius:99px;
+  background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.5);
+  user-select:text;-webkit-user-select:text;              /* still selectable */
+  transition:background .14s,border-color .14s;
 }
-.ribbon-id:hover{filter:brightness(1.1)}
+.ribbon-id:hover{background:rgba(255,255,255,.28);border-color:#fff}
 .ribbon-id:active{transform:translateY(1px)}
-@media (max-width:400px){
-  .ribbon{font-size:9.5px;letter-spacing:.03em}
+.ribbon-id:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (max-width:560px){
+  .ribbon{padding:9px 12px}
+  .ribbon-in{font-size:.9rem;gap:8px}
+  .ribbon-id{font-size:.98rem;padding:2px 11px}
 }
-/* the boarding-pass header now sits under the ribbon, not over it */
+/* everything starts below the fixed ribbon */
+body{padding-top:var(--ribbon-h)}
 .bp{top:var(--ribbon-h)}
 #screen-login{min-height:calc(100vh - var(--ribbon-h))}
 
@@ -420,7 +438,8 @@ main{padding-block:22px 72px}
 <!-- Persistent contact ribbon — sits above every screen of the portal. -->
 <div class="ribbon">
   <span class="ribbon-in">Contact T.Chris for more info on Line ID:
-    <button class="ribbon-id" id="line-id" title="Tap to copy">pegasus028</button>
+    <a class="ribbon-id" id="line-id" href="https://line.me/ti/p/s8-dggjcqD"
+       target="_blank" rel="noopener" title="Add T.Chris on LINE">pegasus028</a>
   </span>
 </div>
 
@@ -443,8 +462,8 @@ main{padding-block:22px 72px}
         <input type="text" id="f-id" autocomplete="username" placeholder="e.g. m5-ploy" spellcheck="false">
       </div>
       <div class="field hidden" id="wrap-name">
-        <label for="f-name">Your name</label>
-        <input type="text" id="f-name" autocomplete="name" placeholder="How your teacher will see you">
+        <label for="f-name">Your English Nickname</label>
+        <input type="text" id="f-name" autocomplete="name" placeholder="What your teacher calls you in class">
       </div>
       <div class="field">
         <label for="f-pw">Password</label>
@@ -452,7 +471,6 @@ main{padding-block:22px 72px}
       </div>
       <div id="login-msg" class="msg info hidden"></div>
       <button class="btn primary wide" id="btn-go">Log in</button>
-      <button class="btn ghost wide" id="btn-demo">Look around first — nothing is saved</button>
       <p class="tiny">Your ID and password are yours to choose. Keep them simple; your teacher can see your progress but not your password.</p>
     </div>
   </div>
