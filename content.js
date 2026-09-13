@@ -1014,7 +1014,7 @@ STAGES.push({
 
 /* ===== STAGE 5 — TERMS & CONDITIONS ==================================== */
 STAGES.push({
-  id: 's5', podcast: 'audio/gate-5.mp3', slides: '', video: '', art: 'contract', n: 5, name: 'Terms & Conditions', cefr: 'B2',
+  id: 's5', podcast: 'audio/gate-5.mp3', slides: 'slides/gate-5.pdf', video: 'https://youtu.be/Zz_kC5Vz_1I', art: 'contract', n: 5, name: 'Terms & Conditions', cefr: 'B2',
   gate: 'Gate 5',
   blurb: 'The small print of comparison. What exactly is being compared with what — and why "cheaper than Tokyo" is the most common C1 writing error in the language.',
   lessons: [
