@@ -832,7 +832,7 @@ STAGES.push({
 
 /* ===== STAGE 4 — TIMETABLE ============================================= */
 STAGES.push({
-  id: 's4', podcast: 'audio/gate-4.mp3', slides: '', video: '', art: 'timetable', n: 4, name: 'Timetable', cefr: 'B2',
+  id: 's4', podcast: 'audio/gate-4.mp3', slides: 'slides/gate-4.pdf', video: 'https://youtu.be/hMTIsDt_gOo', art: 'timetable', n: 4, name: 'Timetable', cefr: 'B2',
   gate: 'Gate 4',
   blurb: '"It is faster" tells nobody anything. This stage is about the slot in front of the comparative — the one that says how much.',
   lessons: [
